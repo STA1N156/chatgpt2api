@@ -89,15 +89,15 @@ export function ImageResults({
               fontFamily: '"Palatino Linotype","Book Antiqua","URW Palladio L","Times New Roman",serif',
             }}
           >
-            Turn ideas into images
+            GPT-IMAGE-2
           </h1>
           <p
-            className="mx-auto mt-3 max-w-[280px] text-sm italic tracking-[0.01em] text-stone-500 sm:mt-4 sm:max-w-none sm:text-[15px]"
+            className="mx-auto mt-3 max-w-[280px] text-sm tracking-[0.01em] text-stone-500 sm:mt-4 sm:max-w-none sm:text-[15px]"
             style={{
               fontFamily: '"Palatino Linotype","Book Antiqua","URW Palladio L","Times New Roman",serif',
             }}
           >
-            在同一窗口里保留本地历史与任务状态，并从已有结果图继续发起新的无状态编辑。
+            完全免费，单次最多六张，By STA1N
           </p>
         </div>
       </div>

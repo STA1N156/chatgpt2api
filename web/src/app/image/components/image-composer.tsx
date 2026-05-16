@@ -14,6 +14,7 @@ type ImageComposerProps = {
   imageSize: string;
   availableQuota: string;
   activeTaskCount: number;
+  maxImageCount?: number;
   referenceImages: Array<{ name: string; dataUrl: string }>;
   textareaRef: RefObject<HTMLTextAreaElement | null>;
   fileInputRef: RefObject<HTMLInputElement | null>;
@@ -32,6 +33,7 @@ export function ImageComposer({
   imageSize,
   availableQuota,
   activeTaskCount,
+  maxImageCount = 100,
   referenceImages,
   textareaRef,
   fileInputRef,
@@ -137,6 +139,12 @@ export function ImageComposer({
           </div>
         ) : null}
 
+        <div className="mb-2 flex justify-end px-1 sm:mb-3">
+          <div className="shrink-0 rounded-full bg-stone-100 px-3 py-1.5 text-xs font-medium text-stone-600 sm:px-3.5 sm:py-2">
+            号池额度 {availableQuota}
+          </div>
+        </div>
+
         <div className="overflow-hidden rounded-[24px] border border-stone-200 bg-white shadow-[0_14px_60px_-42px_rgba(15,23,42,0.45)] sm:rounded-[32px] sm:shadow-none">
           <div
             className="relative cursor-text"
@@ -183,9 +191,6 @@ export function ImageComposer({
                     <ImagePlus className="size-3.5 sm:size-4" />
                     <span className="hidden sm:inline">{referenceImages.length > 0 ? "添加参考图" : "上传"}</span>
                   </Button>
-                  <div className="shrink-0 rounded-full bg-stone-100 px-2 py-1 text-[10px] font-medium text-stone-600 sm:px-3 sm:py-2 sm:text-xs">
-                    <span className="hidden sm:inline">剩余额度 </span>{availableQuota}
-                  </div>
                   {activeTaskCount > 0 && (
                     <div className="flex shrink-0 items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[10px] font-medium text-amber-700 sm:gap-1.5 sm:px-3 sm:py-2 sm:text-xs">
                       <LoaderCircle className="size-3 animate-spin" />
@@ -198,7 +203,7 @@ export function ImageComposer({
                       type="number"
                       inputMode="numeric"
                       min="1"
-                      max="100"
+                      max={maxImageCount}
                       step="1"
                       value={imageCount}
                       onChange={(event) => onImageCountChange(event.target.value)}

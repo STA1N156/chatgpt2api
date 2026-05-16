@@ -1,4 +1,5 @@
 import { httpRequest, request } from "@/lib/request";
+import { getPublicImageUserId } from "@/store/image-conversations";
 
 export type AccountType = string;
 export type AccountStatus = "正常" | "限流" | "异常" | "禁用";
@@ -181,6 +182,11 @@ export type ImageTask = {
 type ImageTaskListResponse = {
   items: ImageTask[];
   missing_ids: string[];
+};
+
+export type PublicImageQuota = {
+  quota: number;
+  available: number;
 };
 
 export type LoginResponse = {
@@ -379,6 +385,79 @@ export async function fetchImageTasks(ids: string[]) {
     params.set("ids", ids.join(","));
   }
   return httpRequest<ImageTaskListResponse>(`/api/image-tasks${params.toString() ? `?${params.toString()}` : ""}`);
+}
+
+function publicUserHeaders() {
+  return { "X-User-Id": getPublicImageUserId() };
+}
+
+export async function createPublicImageGenerationTasks(
+  clientTaskIds: string[],
+  prompt: string,
+  model?: ImageModel,
+  size?: string,
+) {
+  return httpRequest<ImageTaskListResponse>("/api/public/image-tasks/generations", {
+    method: "POST",
+    body: {
+      client_task_ids: clientTaskIds,
+      prompt,
+      ...(model ? { model } : {}),
+      ...(size ? { size } : {}),
+    },
+    headers: publicUserHeaders(),
+    redirectOnUnauthorized: false,
+  });
+}
+
+export async function createPublicImageEditTasks(
+  clientTaskIds: string[],
+  files: File | File[],
+  prompt: string,
+  model?: ImageModel,
+  size?: string,
+) {
+  const formData = new FormData();
+  const uploadFiles = Array.isArray(files) ? files : [files];
+
+  uploadFiles.forEach((file) => {
+    formData.append("image", file);
+  });
+  formData.append("client_task_ids", JSON.stringify(clientTaskIds));
+  formData.append("prompt", prompt);
+  if (model) {
+    formData.append("model", model);
+  }
+  if (size) {
+    formData.append("size", size);
+  }
+
+  return httpRequest<ImageTaskListResponse>("/api/public/image-tasks/edits", {
+    method: "POST",
+    body: formData,
+    headers: publicUserHeaders(),
+    redirectOnUnauthorized: false,
+  });
+}
+
+export async function fetchPublicImageTasks(ids: string[]) {
+  const params = new URLSearchParams();
+  if (ids.length > 0) {
+    params.set("ids", ids.join(","));
+  }
+  return httpRequest<ImageTaskListResponse>(
+    `/api/public/image-tasks${params.toString() ? `?${params.toString()}` : ""}`,
+    {
+      headers: publicUserHeaders(),
+      redirectOnUnauthorized: false,
+    },
+  );
+}
+
+export async function fetchPublicImageQuota() {
+  return httpRequest<PublicImageQuota>("/api/public/image-quota", {
+    redirectOnUnauthorized: false,
+  });
 }
 
 export async function fetchSettingsConfig() {

@@ -56,7 +56,7 @@ export function TopNav() {
     router.replace("/login");
   };
 
-  if (pathname === "/login" || session === undefined || !session) {
+  if (pathname === "/login" || pathname === "/user" || pathname.startsWith("/user/") || session === undefined || !session) {
     return null;
   }
 
